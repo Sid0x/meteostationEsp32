@@ -1,0 +1,6 @@
++5   -> 5V
+CS   -> G17
+MOSI -> G23 VPSI MOSI
+SCK  -> G18 VSPI SCK
+MISO -> G19 VSPI MISO
+GND  ->  GND
