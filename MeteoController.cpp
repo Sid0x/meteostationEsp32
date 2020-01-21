@@ -1,39 +1,38 @@
-#include "Controller.h"
-#include "Service.h"
+#include "MeteoController.h"
+#include "MeteoDataUtils.h"
 
 #include "WiFi.h"
 #include "ESPAsyncWebServer.h"
-#include "FlashUtils.h"
+#include "MeteoFlashUtils.h"
+#include "MeteoDataUtils.h"
 #include "SD.h"
 
 AsyncWebServer server(80);
+MeteoDataUtils meteoDataUtils;
 
 const char* ssid = "Sidox";
 const char* password = "0636489803";
 
-const char* espS;
-const char* espP;
+const char* espSsid = "ESP32";
+const char* espPassword = "12345678";
 
-void Controller::initialization (const char* espSsid, const char* espPassword) {
-  espS = espSsid;
-  espP = espPassword;
+void MeteoController::initialization () {
+  initializationSoftAP();
+  initializationWifi();
 
-  Controller::initializationSoftAP();
-  Controller::initializationWifi();
-
-  Controller::mapping();
+  mapping();
 
   server.begin();
 }
 
-void Controller::initializationSoftAP() {
-  WiFi.softAP(espS, espP);
+void MeteoController::initializationSoftAP() {
+  WiFi.softAP(espSsid, espPassword);
 
   Serial.print("SoftAP ip address: ");
   Serial.println(WiFi.softAPIP());
 }
 
-void Controller::initializationWifi() {
+void MeteoController::initializationWifi() {
   WiFi.begin(ssid, password);
 
   if (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -44,25 +43,25 @@ void Controller::initializationWifi() {
   }
 }
 
-void Controller::mapping() {
+void MeteoController::mapping() {
   server.onNotFound([](AsyncWebServerRequest * request) {
     request->send(404);
   });
 
   server.on("/getSdListDir", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->send(200, "application/json", FlashUtils::listDir(SD, "/", 0));
+    request->send(200, "application/json", MeteoFlashUtils::listDir(SD, "/", 0));
   });
 
   server.on("/getNetworks", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->send(200, "application/json", Service::networks());
+    request->send(meteoDataUtils.getNetworks());
   });
 
   server.on("/disconnectWiFi", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->send(200, "application/json", Service::disconnectWiFi());
+    request->send(200, "application/json", MeteoDataUtils::disconnectWiFi());
   });
 
-  server.on("/getInfoWiFi", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->send(200, "application/json", Service::infoWiFi());
+  server.on("/getInfo", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(meteoDataUtils.getInfo());
   });
 
 }
