@@ -1,4 +1,4 @@
-#include "DbUtils.h"
+#include "MeteoDbUtils.h"
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -8,7 +8,7 @@
 const char* data = "Callback function called";
 char *zErrMsg = 0;
 
-int DbUtils::callBack(void *data, int argc, char **argv, char **azColName) {
+int MeteoDbUtils::callBack(void *data, int argc, char **argv, char **azColName) {
   int i;
   Serial.printf("%s: ", (const char*)data);
   for (i = 0; i < argc; i++) {
@@ -18,7 +18,7 @@ int DbUtils::callBack(void *data, int argc, char **argv, char **azColName) {
   return 0;
 }
 
-int DbUtils::openDb(const char *filename, sqlite3 **db) {
+int MeteoDbUtils::openDb(const char *filename, sqlite3 **db) {
   int rc = sqlite3_open(filename, db);
   if (rc) {
     Serial.printf("Can't open database: %s\n", sqlite3_errmsg(*db));
@@ -29,7 +29,7 @@ int DbUtils::openDb(const char *filename, sqlite3 **db) {
   return rc;
 }
 
-int DbUtils::dbExec(sqlite3 *db, const char *sql) {
+int MeteoDbUtils::dbExec(sqlite3 *db, const char *sql) {
   Serial.println(sql);
   long start = micros();
   int rc = sqlite3_exec(db, sql, callBack, (void*)data, &zErrMsg);
@@ -44,13 +44,13 @@ int DbUtils::dbExec(sqlite3 *db, const char *sql) {
   return rc;
 }
 
-void DbUtils::checkDb() {
+void MeteoDbUtils::checkDb() {
   sqlite3 *db;
 
   sqlite3_initialize();
   int rc;
 
-  if (DbUtils::openDb("/sd/db/esp32.db", &db))
+  if (openDb("/sd/db/esp32.db", &db))
     return;
 
   char* sql = "CREATE TABLE IF NOT EXISTS Data("
@@ -63,7 +63,7 @@ void DbUtils::checkDb() {
               "mhZ19          TEXT,"
               "co2            TEXT );";
 
-  rc = DbUtils::dbExec(db, sql);
+  rc = dbExec(db, sql);
   if (rc != SQLITE_OK) {
     sqlite3_close(db);
     return;

@@ -4,18 +4,22 @@
 #include "ArduinoJson.h"
 #include "WiFi.h"
 #include "Arduino.h"
-#include "NTPClient.h"
-#include "WiFiUdp.h"
 #include "Wire.h"
 #include "Adafruit_Sensor.h"
 #include "Adafruit_BME280.h"
+#include "NTPClient.h"
+#include "WiFiUdp.h"
 
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
 Adafruit_BME280 bme;
+//NTPClient timeClient;
 
 int const bmeSda = 17;
 int const bmeScl = 16;
+
+void MeteoDataUtils::initialization(NTPClient & timeClient) {
+  //  this->timeClient = timeClient;
+  timeClient.update();
+}
 
 void MeteoDataUtils::initializationBme() {
   Wire.begin(bmeSda, bmeScl);
@@ -33,7 +37,7 @@ AsyncJsonResponse * MeteoDataUtils::getInfo() {
   root["heap"] = ESP.getFreeHeap();
   root["status"] = WiFi.status();
   root["ssid"] = WiFi.SSID();
-  root["localIP"] = getwiFiLocalIP();
+  root["localIP"] = getLocalIP();
 
   response->setLength();
 
@@ -60,31 +64,9 @@ AsyncJsonResponse * MeteoDataUtils::getNetworks() {
   response->setLength();
 
   return response;
-
-
-  //  String json;
-  //  DynamicJsonDocument doc(2048);
-  //  JsonArray data = doc.createNestedArray("networks");
-  //  int count = WiFi.scanComplete();
-  //
-  //  if (count == -2) {
-  //    WiFi.scanNetworks(true);
-  //  } else if (count) {
-  //    for (int i = 0; i < count; ++i) {
-  //      data.add(WiFi.SSID(i));
-  //    }
-  //    WiFi.scanDelete();
-  //    if (WiFi.scanComplete() == -2) {
-  //      WiFi.scanNetworks(true);
-  //    }
-  //  }
-  //
-  //  serializeJson(doc, json);
-  //
-  //  return json;
 }
 
-String MeteoDataUtils::getwiFiLocalIP() {
+String MeteoDataUtils::getLocalIP() {
   char wiFiLocalIP[16];
 
   sprintf(wiFiLocalIP, "%d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3]);
@@ -106,15 +88,10 @@ void MeteoDataUtils::recordingData() {
   //  Serial.println(" hPa");
 }
 
-void MeteoDataUtils::initialization(int timeOffset) {
-  timeClient.begin();
-  timeClient.setTimeOffset(timeOffset);
-}
-
 long MeteoDataUtils::currentTime() {
-  timeClient.update();
-
-  return timeClient.getEpochTime();
+//  timeClient.update();
+//
+//  return timeClient.getEpochTime();
 }
 
 String MeteoDataUtils::convertToIsoTime(long timeStamp) {
@@ -144,19 +121,15 @@ String MeteoDataUtils::convertToIsoTime(long timeStamp) {
          hoursStr + ":" + minuteStr + ":" + secondStr;
 }
 
-String MeteoDataUtils::disconnectWiFi() {
-  DynamicJsonDocument doc(32);
-  String json;
+AsyncJsonResponse * MeteoDataUtils::disconnectWiFi() {
+  AsyncJsonResponse * response = new AsyncJsonResponse();
+  JsonObject root = response->getRoot();
 
-  if (WiFi.disconnect()) {
-    doc["disconnectWiFi"] = "success";
-  } else {
-    doc["disconnectWiFi"] = "fail";
-  };
+  root["status"] = WiFi.disconnect();
 
-  serializeJson(doc, json);
+  response->setLength();
 
-  return json;
+  return response;
 }
 
 //String Model::authorization(String ssid, String password) {

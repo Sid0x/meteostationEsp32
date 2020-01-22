@@ -231,7 +231,7 @@ void MeteoFlashUtils::prepareDb() {
   }
 
   if (!checkerDir) {
-    MeteoFlashUtils::createDir(SD, "/db");
+    createDir(SD, "/db");
   }
 
   ls = MeteoFlashUtils::listDir(SD, "/db", 0);
@@ -244,7 +244,7 @@ void MeteoFlashUtils::prepareDb() {
   }
 
   if (!checkerDb) {
-    MeteoFlashUtils::writeFile(SD, "/db/esp32.db", "");
+    writeFile(SD, "/db/esp32.db", "");
   }
 }
 
