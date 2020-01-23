@@ -4,17 +4,15 @@
 #include "NTPClient.h"
 #include "WiFiUdp.h"
 
-#ifndef MeteoDataUtils_h
-#define MeteoDataUtils_h
+#ifndef DataUtils_h
+#define DataUtils_h
 
-class MeteoDataUtils {
+class DataUtils {
   public:
     AsyncJsonResponse * getInfo();
-    void initialization(NTPClient & timeClient);
-    long currentTime();
+    void initialization();
     AsyncJsonResponse * getNetworks();
     String convertToIsoTime(long timeStamp);
-    AsyncJsonResponse * disconnectWiFi();
     void initializationBme();
     void recordingData();
   private:

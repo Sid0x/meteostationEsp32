@@ -1,9 +1,9 @@
 #include "sqlite3.h"
 
-#ifndef  MeteoDbUtils_h
-#define  MeteoDbUtils_h
+#ifndef  DbUtils_h
+#define  DbUtils_h
 
-class MeteoDbUtils {
+class DbUtils {
   public:
     int openDb(const char *filename, sqlite3 **db);
     int dbExec(sqlite3 *db, const char *sql);

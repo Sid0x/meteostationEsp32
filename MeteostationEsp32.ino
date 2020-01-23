@@ -1,7 +1,6 @@
-#include "MeteoFlashUtils.h"
-#include "MeteoController.h"
-#include "MeteoDataUtils.h"
-#include "MeteoDataUtils.h"
+#include "FlashUtils.h"
+#include "Controller.h"
+#include "DataUtils.h"
 
 #include "SD.h"
 //#include "SPIFFS.h"
@@ -13,17 +12,17 @@ const int timeOffset = 3600 * 2;
 unsigned long previousMillis;
 unsigned long dataTimer = 0;
 
-MeteoController controller;
+Controller controller;
 
 void setup() {
   Serial.begin(115200);
 
-  //  MeteoFlashUtils::initializationSD(flashCardsPin);/
-  //  MeteoFlashUtils::initializationESP(formatSPIFFSifFailed);
+  //  FlashUtils::initializationSD(flashCardsPin);/
+  //  FlashUtils::initializationESP(formatSPIFFSifFailed);
   controller.initialization(timeOffset);
 
-  //  MeteoFlashUtils::deleteDb();
-  //  MeteoFlashUtils::prepareDb();
+  //  FlashUtils::deleteDb();
+  //  FlashUtils::prepareDb();
   //  DbUtils::checkDb();
 }
 

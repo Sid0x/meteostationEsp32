@@ -1,4 +1,4 @@
-#include "MeteoDataUtils.h"
+#include "DataUtils.h"
 
 #include "AsyncJson.h"
 #include "ArduinoJson.h"
@@ -11,17 +11,14 @@
 #include "WiFiUdp.h"
 
 Adafruit_BME280 bme;
-//NTPClient timeClient;
 
 int const bmeSda = 17;
 int const bmeScl = 16;
 
-void MeteoDataUtils::initialization(NTPClient & timeClient) {
-  //  this->timeClient = timeClient;
-  timeClient.update();
+void DataUtils::initialization() {
 }
 
-void MeteoDataUtils::initializationBme() {
+void DataUtils::initializationBme() {
   Wire.begin(bmeSda, bmeScl);
 
   bool statusBme = bme.begin(0x76, &Wire);
@@ -30,7 +27,7 @@ void MeteoDataUtils::initializationBme() {
   }
 }
 
-AsyncJsonResponse * MeteoDataUtils::getInfo() {
+AsyncJsonResponse * DataUtils::getInfo() {
   AsyncJsonResponse * response = new AsyncJsonResponse();
   JsonObject root = response->getRoot();
 
@@ -44,7 +41,7 @@ AsyncJsonResponse * MeteoDataUtils::getInfo() {
   return response;
 }
 
-AsyncJsonResponse * MeteoDataUtils::getNetworks() {
+AsyncJsonResponse * DataUtils::getNetworks() {
   AsyncJsonResponse * response = new AsyncJsonResponse();
   JsonObject root = response->getRoot();
   int count = WiFi.scanComplete();
@@ -66,7 +63,7 @@ AsyncJsonResponse * MeteoDataUtils::getNetworks() {
   return response;
 }
 
-String MeteoDataUtils::getLocalIP() {
+String DataUtils::getLocalIP() {
   char wiFiLocalIP[16];
 
   sprintf(wiFiLocalIP, "%d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3]);
@@ -74,7 +71,7 @@ String MeteoDataUtils::getLocalIP() {
   return wiFiLocalIP;
 }
 
-void MeteoDataUtils::recordingData() {
+void DataUtils::recordingData() {
   //  Serial.print("Temperature from BME2 = ");
   //  Serial.print(bme.readTemperature());
   //  Serial.println(" *C");
@@ -88,13 +85,7 @@ void MeteoDataUtils::recordingData() {
   //  Serial.println(" hPa");
 }
 
-long MeteoDataUtils::currentTime() {
-//  timeClient.update();
-//
-//  return timeClient.getEpochTime();
-}
-
-String MeteoDataUtils::convertToIsoTime(long timeStamp) {
+String DataUtils::convertToIsoTime(long timeStamp) {
   time_t rawtime = timeStamp;
   struct tm * ti;
   ti = localtime(&rawtime);
@@ -119,17 +110,6 @@ String MeteoDataUtils::convertToIsoTime(long timeStamp) {
 
   return yearStr + "-" + monthStr + "-" + dayStr + " " +
          hoursStr + ":" + minuteStr + ":" + secondStr;
-}
-
-AsyncJsonResponse * MeteoDataUtils::disconnectWiFi() {
-  AsyncJsonResponse * response = new AsyncJsonResponse();
-  JsonObject root = response->getRoot();
-
-  root["status"] = WiFi.disconnect();
-
-  response->setLength();
-
-  return response;
 }
 
 //String Model::authorization(String ssid, String password) {

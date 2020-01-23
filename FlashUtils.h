@@ -1,10 +1,10 @@
 #include "Arduino.h"
 #include "FS.h"
 
-#ifndef  MeteoFlashUtils_h
-#define  MeteoFlashUtils_h
+#ifndef  FlashUtils_h
+#define  FlashUtils_h
 
-class MeteoFlashUtils {
+class FlashUtils {
   public:
     String listDir(fs::FS &fs, const char * dirname, uint8_t levels);
     void createDir(fs::FS &fs, const char * path);

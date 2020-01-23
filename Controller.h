@@ -1,13 +1,14 @@
 #include "Arduino.h"
-#include "MeteoDataUtils.h"
-#include "MeteoFlashUtils.h"
+#include "DataUtils.h"
+#include "FlashUtils.h"
 
-#ifndef MeteoController_h
-#define MeteoController_h
+#ifndef Controller_h
+#define Controller_h
 
-class MeteoController {
+class Controller {
   public:
     void initialization(int timeOffset);
+    static long currentTime();
   private:
     void initializationSoftAP();
     void initializationWifi();

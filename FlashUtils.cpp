@@ -1,4 +1,4 @@
-#include "MeteoFlashUtils.h"
+#include "FlashUtils.h"
 
 #include "SPIFFS.h"
 #include "FS.h"
@@ -8,7 +8,7 @@
 #include "WiFi.h"
 #include "ArduinoJson.h"
 
-String MeteoFlashUtils::listDir(fs::FS &fs, const char * dirname, uint8_t levels) {
+String FlashUtils::listDir(fs::FS &fs, const char * dirname, uint8_t levels) {
   String json;
   DynamicJsonDocument doc(2048);
   JsonArray data = doc.createNestedArray("listDir");
@@ -52,7 +52,7 @@ String MeteoFlashUtils::listDir(fs::FS &fs, const char * dirname, uint8_t levels
   return json;
 }
 
-void MeteoFlashUtils::createDir(fs::FS &fs, const char * path) {
+void FlashUtils::createDir(fs::FS &fs, const char * path) {
   Serial.printf("Creating Dir: %s\n", path);
   if (fs.mkdir(path)) {
     Serial.println("Dir created");
@@ -61,7 +61,7 @@ void MeteoFlashUtils::createDir(fs::FS &fs, const char * path) {
   }
 }
 
-void MeteoFlashUtils::removeDir(fs::FS &fs, const char * path) {
+void FlashUtils::removeDir(fs::FS &fs, const char * path) {
   Serial.printf("Removing Dir: %s\n", path);
   if (fs.rmdir(path)) {
     Serial.println("Dir removed");
@@ -70,7 +70,7 @@ void MeteoFlashUtils::removeDir(fs::FS &fs, const char * path) {
   }
 }
 
-void MeteoFlashUtils::readFile(fs::FS &fs, const char * path) {
+void FlashUtils::readFile(fs::FS &fs, const char * path) {
   Serial.printf("Reading file: %s\n", path);
 
   File file = fs.open(path);
@@ -86,7 +86,7 @@ void MeteoFlashUtils::readFile(fs::FS &fs, const char * path) {
   file.close();
 }
 
-void MeteoFlashUtils::writeFile(fs::FS &fs, const char * path, const char * message) {
+void FlashUtils::writeFile(fs::FS &fs, const char * path, const char * message) {
   Serial.printf("Writing file: %s\n", path);
 
   File file = fs.open(path, FILE_WRITE);
@@ -102,7 +102,7 @@ void MeteoFlashUtils::writeFile(fs::FS &fs, const char * path, const char * mess
   file.close();
 }
 
-void MeteoFlashUtils::appendFile(fs::FS &fs, const char * path, const char * message) {
+void FlashUtils::appendFile(fs::FS &fs, const char * path, const char * message) {
   Serial.printf("Appending to file: %s\n", path);
 
   File file = fs.open(path, FILE_APPEND);
@@ -118,7 +118,7 @@ void MeteoFlashUtils::appendFile(fs::FS &fs, const char * path, const char * mes
   file.close();
 }
 
-void MeteoFlashUtils::renameFile(fs::FS &fs, const char * path1, const char * path2) {
+void FlashUtils::renameFile(fs::FS &fs, const char * path1, const char * path2) {
   Serial.printf("Renaming file %s to %s\n", path1, path2);
   if (fs.rename(path1, path2)) {
     Serial.println("File renamed");
@@ -127,7 +127,7 @@ void MeteoFlashUtils::renameFile(fs::FS &fs, const char * path1, const char * pa
   }
 }
 
-void MeteoFlashUtils::deleteFile(fs::FS &fs, const char * path) {
+void FlashUtils::deleteFile(fs::FS &fs, const char * path) {
   Serial.printf("Deleting file: %s\n", path);
   if (fs.remove(path)) {
     Serial.println("File deleted");
@@ -136,7 +136,7 @@ void MeteoFlashUtils::deleteFile(fs::FS &fs, const char * path) {
   }
 }
 
-void MeteoFlashUtils::testFileIO(fs::FS &fs, const char * path) {
+void FlashUtils::testFileIO(fs::FS &fs, const char * path) {
   File file = fs.open(path);
   static uint8_t buf[512];
   size_t len = 0;
@@ -178,7 +178,7 @@ void MeteoFlashUtils::testFileIO(fs::FS &fs, const char * path) {
   file.close();
 }
 
-void MeteoFlashUtils::initializationSD(int flashCardsPin) {
+void FlashUtils::initializationSD(int flashCardsPin) {
 
   if (!SD.begin(flashCardsPin)) {
     Serial.println("Card Mount Failed");
@@ -209,15 +209,15 @@ void MeteoFlashUtils::initializationSD(int flashCardsPin) {
   Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
 }
 
-void MeteoFlashUtils::initializationESP(bool formatSPIFFSifFailed) {
+void FlashUtils::initializationESP(bool formatSPIFFSifFailed) {
   if (!SPIFFS.begin(formatSPIFFSifFailed)) {
     Serial.println("SPIFFS Mount Failed");
     return;
   }
 }
 
-void MeteoFlashUtils::prepareDb() {
-  String ls = MeteoFlashUtils::listDir(SD, "/", 0);
+void FlashUtils::prepareDb() {
+  String ls = FlashUtils::listDir(SD, "/", 0);
   DynamicJsonDocument doc(2048);
   deserializeJson(doc, ls);
   JsonArray dirs = doc["listDir"];
@@ -234,7 +234,7 @@ void MeteoFlashUtils::prepareDb() {
     createDir(SD, "/db");
   }
 
-  ls = MeteoFlashUtils::listDir(SD, "/db", 0);
+  ls = FlashUtils::listDir(SD, "/db", 0);
   deserializeJson(doc, ls);
   dirs = doc["listDir"];
   for (String dir : dirs) {
@@ -248,7 +248,7 @@ void MeteoFlashUtils::prepareDb() {
   }
 }
 
-void MeteoFlashUtils::deleteDb() {
+void FlashUtils::deleteDb() {
   deleteFile(SD, "/db/esp32.db");
   removeDir(SD, "/db");
 }

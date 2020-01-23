@@ -1,16 +1,16 @@
-#include "MeteoController.h"
+#include "Controller.h"
 
 #include "WiFi.h"
 #include "ESPAsyncWebServer.h"
-#include "MeteoFlashUtils.h"
-#include "MeteoDataUtils.h"
+#include "FlashUtils.h"
+#include "DataUtils.h"
 #include "SD.h"
 #include "NTPClient.h"
 #include "WiFiUdp.h"
 
 AsyncWebServer server(80);
-MeteoDataUtils dataUtils;
-MeteoFlashUtils flashUtils;
+DataUtils dataUtils;
+FlashUtils flashUtils;
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
@@ -20,7 +20,7 @@ const char* password = "0636489803";
 const char* espSsid = "ESP32";
 const char* espPassword = "12345678";
 
-void MeteoController::initialization (int timeOffset) {
+void Controller::initialization (int timeOffset) {
   initializationSoftAP();
   initializationWifi();
   mapping();
@@ -29,18 +29,16 @@ void MeteoController::initialization (int timeOffset) {
 
   timeClient.begin();
   timeClient.setTimeOffset(timeOffset);
-
-  dataUtils.initialization(timeClient);
 }
 
-void MeteoController::initializationSoftAP() {
+void Controller::initializationSoftAP() {
   WiFi.softAP(espSsid, espPassword);
 
   Serial.print("SoftAP ip address: ");
   Serial.println(WiFi.softAPIP());
 }
 
-void MeteoController::initializationWifi() {
+void Controller::initializationWifi() {
   WiFi.begin(ssid, password);
 
   if (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -51,7 +49,13 @@ void MeteoController::initializationWifi() {
   }
 }
 
-void MeteoController::mapping() {
+long Controller::currentTime() {
+  timeClient.update();
+
+  return timeClient.getEpochTime();
+}
+
+void Controller::mapping() {
   server.onNotFound([](AsyncWebServerRequest * request) {
     request->send(404);
   });
@@ -65,7 +69,7 @@ void MeteoController::mapping() {
   });
 
   server.on("/disconnectWiFi", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->send(dataUtils.disconnectWiFi());
+    request->send(WiFi.disconnect());
   });
 
   server.on("/getInfo", HTTP_GET, [](AsyncWebServerRequest * request) {
