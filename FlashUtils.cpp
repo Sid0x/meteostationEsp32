@@ -209,15 +209,15 @@ void FlashUtils::initializationSD(int flashCardsPin) {
   Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
 }
 
-void FlashUtils::initializationESP(bool formatSPIFFSifFailed) {
+void FlashUtils::initializationSPIFFS(bool formatSPIFFSifFailed) {
   if (!SPIFFS.begin(formatSPIFFSifFailed)) {
     Serial.println("SPIFFS Mount Failed");
     return;
   }
 }
 
-void FlashUtils::prepareDb() {
-  String ls = FlashUtils::listDir(SD, "/", 0);
+void FlashUtils::prepareDb(fs::FS &fs) {
+  String ls = FlashUtils::listDir(fs, "/", 0);
   DynamicJsonDocument doc(2048);
   deserializeJson(doc, ls);
   JsonArray dirs = doc["listDir"];
@@ -231,10 +231,10 @@ void FlashUtils::prepareDb() {
   }
 
   if (!checkerDir) {
-    createDir(SD, "/db");
+    createDir(fs, "/db");
   }
 
-  ls = FlashUtils::listDir(SD, "/db", 0);
+  ls = FlashUtils::listDir(fs, "/db", 0);
   deserializeJson(doc, ls);
   dirs = doc["listDir"];
   for (String dir : dirs) {
@@ -244,11 +244,11 @@ void FlashUtils::prepareDb() {
   }
 
   if (!checkerDb) {
-    writeFile(SD, "/db/esp32.db", "");
+    writeFile(fs, "/db/esp32.db", "");
   }
 }
 
-void FlashUtils::deleteDb() {
-  deleteFile(SD, "/db/esp32.db");
-  removeDir(SD, "/db");
+void FlashUtils::deleteDb(fs::FS &fs) {
+  deleteFile(fs, "/db/esp32.db");
+  removeDir(fs, "/db");
 }

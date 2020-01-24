@@ -4,27 +4,8 @@
 #include "ArduinoJson.h"
 #include "WiFi.h"
 #include "Arduino.h"
-#include "Wire.h"
-#include "Adafruit_Sensor.h"
-#include "Adafruit_BME280.h"
-#include "NTPClient.h"
-#include "WiFiUdp.h"
-
-Adafruit_BME280 bme;
-
-int const bmeSda = 17;
-int const bmeScl = 16;
 
 void DataUtils::initialization() {
-}
-
-void DataUtils::initializationBme() {
-  Wire.begin(bmeSda, bmeScl);
-
-  bool statusBme = bme.begin(0x76, &Wire);
-  if (!statusBme) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-  }
 }
 
 AsyncJsonResponse * DataUtils::getInfo() {
@@ -69,20 +50,6 @@ String DataUtils::getLocalIP() {
   sprintf(wiFiLocalIP, "%d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3]);
 
   return wiFiLocalIP;
-}
-
-void DataUtils::recordingData() {
-  //  Serial.print("Temperature from BME2 = ");
-  //  Serial.print(bme.readTemperature());
-  //  Serial.println(" *C");
-  //
-  //  Serial.print("Humidity from BME2 = ");
-  //  Serial.print(bme.readHumidity());
-  //  Serial.println(" %");
-  //
-  //  Serial.print("Pressure from BME2 = ");
-  //  Serial.print(bme.readPressure() / 100.0F);
-  //  Serial.println(" hPa");
 }
 
 String DataUtils::convertToIsoTime(long timeStamp) {

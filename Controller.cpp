@@ -1,18 +1,16 @@
 #include "Controller.h"
 
+#include "ModuleUtils.h"
 #include "WiFi.h"
 #include "ESPAsyncWebServer.h"
 #include "FlashUtils.h"
 #include "DataUtils.h"
 #include "SD.h"
-#include "NTPClient.h"
-#include "WiFiUdp.h"
 
 AsyncWebServer server(80);
 DataUtils dataUtils;
 FlashUtils flashUtils;
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
+ModuleUtils moduleUtils;
 
 const char* ssid = "Sidox";
 const char* password = "0636489803";
@@ -27,8 +25,7 @@ void Controller::initialization (int timeOffset) {
 
   server.begin();
 
-  timeClient.begin();
-  timeClient.setTimeOffset(timeOffset);
+  moduleUtils.initialization(timeOffset);
 }
 
 void Controller::initializationSoftAP() {
@@ -49,12 +46,6 @@ void Controller::initializationWifi() {
   }
 }
 
-long Controller::currentTime() {
-  timeClient.update();
-
-  return timeClient.getEpochTime();
-}
-
 void Controller::mapping() {
   server.onNotFound([](AsyncWebServerRequest * request) {
     request->send(404);
@@ -68,7 +59,7 @@ void Controller::mapping() {
     request->send(dataUtils.getNetworks());
   });
 
-  server.on("/disconnectWiFi", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/disconnect", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(WiFi.disconnect());
   });
 
@@ -76,4 +67,8 @@ void Controller::mapping() {
     request->send(dataUtils.getInfo());
   });
 
+  server.on("/restart", HTTP_GET, [](AsyncWebServerRequest * request) {
+    ESP.restart();
+    request->send(false);
+  });
 }

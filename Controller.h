@@ -8,7 +8,6 @@
 class Controller {
   public:
     void initialization(int timeOffset);
-    static long currentTime();
   private:
     void initializationSoftAP();
     void initializationWifi();

@@ -16,9 +16,9 @@ class FlashUtils {
     void deleteFile(fs::FS &fs, const char * path);
     void testFileIO(fs::FS &fs, const char * path);
     void initializationSD(const int flashCardsPin);
-    void initializationESP(const bool formatSPIFFSifFailed);
-    void prepareDb();
-    void deleteDb();
+    void initializationSPIFFS(const bool formatSPIFFSifFailed);
+    void prepareDb(fs::FS &fs);
+    void deleteDb(fs::FS &fs);
 };
 
 #endif

@@ -13,11 +13,8 @@ class DataUtils {
     void initialization();
     AsyncJsonResponse * getNetworks();
     String convertToIsoTime(long timeStamp);
-    void initializationBme();
-    void recordingData();
   private:
     String getLocalIP();
-//    NTPClient timeClient;
 };
 
 #endif
